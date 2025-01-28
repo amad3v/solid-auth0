@@ -11,10 +11,12 @@ import {
   User,
 } from '@auth0/auth0-spa-js';
 import type { JSXElement, Resource } from 'solid-js';
+
 export type { Auth0ClientOptions as AuthOptions } from '@auth0/auth0-spa-js';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface LogoutOptions extends Omit<SPALogoutOptions, 'onRedirect'> {}
+
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface RedirectLoginOptions<TAppState = AppState>
   extends Omit<SPARedirectLoginOptions<TAppState>, 'onRedirect'> {}
@@ -24,6 +26,7 @@ export interface RedirectLoginOptions<TAppState = AppState>
  */
 export interface AppState {
   returnTo?: string;
+
   [key: string]: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
@@ -171,7 +174,7 @@ export interface AuthContextProps {
    * The instance of `Auth0Client` as a SolidJS resource
    * Use `authClient()` to access the data.
    */
-  authClient?: Resource<Auth0Client>;
+  authClient: () => Resource<Auth0Client> | undefined;
 }
 
 /**

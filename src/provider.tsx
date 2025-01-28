@@ -115,7 +115,7 @@ export const AuthProvider: Component<AuthProviderProps> = (_props) => {
     <AuthContext.Provider
       value={{
         authManager: store,
-        authClient,
+        authClient: () => authClient,
       }}
     >
       {props.children}

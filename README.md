@@ -1,5 +1,13 @@
 # solid-auth0
 
+---
+
+## ⚠️ Warning ⚠️
+
+**This library is not thoroughly tested.** Use it at your own risk, especially in production environments. Contributions and feedback are welcome to improve the library's reliability and functionality.
+
+---
+
 `solid-auth0` is a modified port of [`auth0-react`](https://github.com/auth0/auth0-react) tailored specifically for the SolidJS framework. It exposes the core interfaces from `@auth0/auth0-spa-js` while providing additional library-specific interfaces to facilitate seamless authentication integration in SolidJS applications.
 
 This library is designed to integrate Auth0 authentication capabilities while leveraging SolidJS's reactivity and rendering model.

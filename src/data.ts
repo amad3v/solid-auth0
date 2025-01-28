@@ -38,5 +38,5 @@ export const initialStore: AuthStoreProps = {
  */
 export const initialContext: AuthContextProps = {
   authManager: initialStore,
-  authClient: undefined,
+  authClient: () => undefined,
 };

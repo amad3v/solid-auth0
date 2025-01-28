@@ -1,13 +1,16 @@
 import { defineConfig } from 'vite';
+import dts from 'vite-plugin-dts';
 import solidPlugin from 'vite-plugin-solid';
-import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
-  plugins: [solidPlugin(), tsconfigPaths()],
-  server: {
-    port: 3000,
-  },
   build: {
-    target: 'esnext',
+    lib: {
+      entry: './src/main.ts',
+      name: 'solid-auth0',
+      formats: ['es', 'umd'],
+      fileName: 'main',
+    },
+    sourcemap: true,
   },
+  plugins: [dts({ rollupTypes: true, tsconfigPath: './tsconfig.json' }), solidPlugin()],
 });

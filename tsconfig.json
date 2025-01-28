@@ -1,38 +1,26 @@
 {
   "compilerOptions": {
-    "strict": true,
-    "target": "ESNext",
+    "target": "ES2020",
+    "useDefineForClassFields": true,
     "module": "ESNext",
-    "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "skipLibCheck": true,
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
-    "types": ["vite/client"],
-    "noEmit": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
     "isolatedModules": true,
-    "skipLibCheck": true,
-    "strictNullChecks": false,
-    "plugins": [
-      {
-        "name": "typescript-plugin-css-modules"
-      }
-    ],
-    "typeRoots": ["./node_modules/@types", "./types"],
+    "moduleDetection": "force",
+    "noEmit": true,
+
+    /* Linting */
+    "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "baseUrl": "./src",
-    "paths": {
-      "@srv/*": ["services/*"],
-      "@cpt/*": ["components/*"],
-      "@ico/*": ["components/icons/*"],
-      "@data/*": ["data/*"],
-      "@utils/*": ["utils/*"],
-      "@forms/*": ["components/forms/*"],
-      "@libs/*": ["lib/*"],
-      "@type/*": ["types/*"]
-    }
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true
   },
-  "include": ["src/**/*", "./**/*.d.ts"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["src"]
 }

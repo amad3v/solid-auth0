@@ -44,23 +44,9 @@ export default [
       'import/parsers': {
         '@typescript-eslint/parser': ['.ts', '.tsx'],
       },
-      // 'import/resolver': {
-      //   typescript: {
-      //     // always try to resolve types under `<root>@types` directory even
-      //     // it doesn't contain any source code, like `@types/unist`
-      //     alwaysTryTypes: true,
-      //     // use <root>/path/to/folder/tsconfig.json
-      //     project: 'tsconfig.json',
-      //   },
-      //   node: true,
-      // },
       'import/resolver-next': [
         createTypeScriptImportResolver({
-          alwaysTryTypes: true, // always try to resolve types under `<root>@types` directory even it doesn't contain any source code, like `@types/unist`
-
-          // Choose from one of the "project" configs below or omit to use <root>/tsconfig.json by default
-
-          // use <root>/path/to/folder/tsconfig.json
+          alwaysTryTypes: true,
           project: 'tsconfig.json',
         }),
       ],
@@ -108,6 +94,7 @@ export default [
       '**/postcss.config.js',
       '**/prettier.config.js',
       '**/tailwind.config.js',
+      '**/typedoc.js',
     ],
   },
 ];
