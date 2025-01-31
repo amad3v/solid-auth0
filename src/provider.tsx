@@ -1,10 +1,23 @@
 import { createAuth0Client } from '@auth0/auth0-spa-js';
-import { type Component, createContext, createResource, mergeProps, useContext } from 'solid-js';
+import {
+  type Component,
+  createContext,
+  createEffect,
+  createResource,
+  mergeProps,
+  useContext,
+} from 'solid-js';
 import { createStore } from 'solid-js/store';
 
 import { initialContext, initialStore } from './data';
 import { AppState, AuthContextProps, AuthProviderProps, AuthStoreProps } from './types';
-import { defaultOnRedirectCallback, hasAuthParams, loginError, setUser, toAuthClientOptions } from './utils';
+import {
+  defaultOnRedirectCallback,
+  hasAuthParams,
+  loginError,
+  setUser,
+  toAuthClientOptions,
+} from './utils';
 import {
   getAccessTokenSilentlyWrapper,
   getAccessTokenWithPopupWrapper,
@@ -85,7 +98,7 @@ export const AuthProvider: Component<AuthProviderProps> = (_props) => {
     setStore('state', {
       isAuthenticated: await client.isAuthenticated(),
       user: setUser(await client.getUser()),
-      isLoading: false,
+      isLoading: true,
       error: undefined,
     });
 
@@ -103,6 +116,10 @@ export const AuthProvider: Component<AuthProviderProps> = (_props) => {
   };
 
   const [authClient] = createResource(handleAuth);
+
+  createEffect(() => {
+    setStore('state', 'isLoading', () => !(authClient.state === 'ready'));
+  });
 
   return (
     <AuthContext.Provider
