@@ -1,8 +1,8 @@
-import { createAuth0Client } from '@auth0/auth0-spa-js';
+import { Auth0Client, createAuth0Client, User } from '@auth0/auth0-spa-js';
 import {
   type Component,
   createContext,
-  createEffect,
+  createMemo,
   createResource,
   mergeProps,
   useContext,
@@ -73,15 +73,16 @@ export const AuthProvider: Component<AuthProviderProps> = (_props) => {
     { onRedirectCallback: defaultOnRedirectCallback, skipRedirectCallback: false },
     _props,
   );
-  // Use store for the context
   const [store, setStore] = createStore<AuthStoreProps>(initialStore);
+
+  const currentUser = (): User => store.state.user;
 
   const handleError = (error: Error) => {
     setStore('state', { error: error, isLoading: false });
     return error;
   };
 
-  const handleAuth = async () => {
+  const handleAuth = async (): Promise<Error | Auth0Client> => {
     const client = await createAuth0Client(toAuthClientOptions(props.clientOptions));
 
     try {
@@ -92,13 +93,13 @@ export const AuthProvider: Component<AuthProviderProps> = (_props) => {
         await client.checkSession();
       }
     } catch (err) {
-      handleError(loginError(err));
+      return handleError(loginError(err));
     }
 
     setStore('state', {
       isAuthenticated: await client.isAuthenticated(),
       user: setUser(await client.getUser()),
-      isLoading: true,
+      isLoading: false,
       error: undefined,
     });
 
@@ -106,29 +107,23 @@ export const AuthProvider: Component<AuthProviderProps> = (_props) => {
       signOut: signOutWrapper(client, setStore),
       loginWithRedirect: loginWithRedirectWrapper(client),
       loginWithPopup: loginWithPopupWrapper(client, setStore, handleError),
-      getAccessTokenSilently: getAccessTokenSilentlyWrapper(client, setStore, store.state.user),
+      getAccessTokenSilently: getAccessTokenSilentlyWrapper(client, setStore, currentUser),
       getIdTokenClaims: getIdTokenClaimsWrapper(client),
-      handleRedirectCallback: handleRedirectCallbackWrapper(client, setStore, store.state.user),
-      getAccessTokenWithPopup: getAccessTokenWithPopupWrapper(client, setStore, store.state.user),
+      handleRedirectCallback: handleRedirectCallbackWrapper(client, setStore, currentUser),
+      getAccessTokenWithPopup: getAccessTokenWithPopupWrapper(client, setStore, currentUser),
     });
 
     return client;
   };
 
-  const [authClient] = createResource(handleAuth);
+  // eslint-disable-next-line solid/reactivity
+  const [authClient] = createResource(() => props.clientOptions, handleAuth);
 
-  createEffect(() => {
-    setStore('state', 'isLoading', () => !(authClient.state === 'ready'));
-  });
+  const value = createMemo<AuthContextProps>(() => ({
+    authManager: store,
+    authClient: () => authClient,
+  }));
 
-  return (
-    <AuthContext.Provider
-      value={{
-        authManager: store,
-        authClient: () => authClient,
-      }}
-    >
-      {props.children}
-    </AuthContext.Provider>
-  );
+  // eslint-disable-next-line solid/reactivity
+  return <AuthContext.Provider value={value()} children={props.children} />;
 };

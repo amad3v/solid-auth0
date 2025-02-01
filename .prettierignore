@@ -3,6 +3,8 @@
 *.
 .vscode/settings.json
 .history
+.tsup
+.idea
 .yarn
 bazel-*
 bazel-bin

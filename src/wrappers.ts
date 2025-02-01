@@ -52,6 +52,7 @@ export const signOutWrapper = (
  * @returns A function that performs a popup login and updates the store with the user's authentication state.
  *
  * @remarks
+ * - The store's `isLoading` state is set to `true` during the login process and updated upon completion.
  * - Errors encountered during the login process are passed to the `errHandler`.
  * - Upon successful login, the store's state is updated.
  *
@@ -63,6 +64,7 @@ export const loginWithPopupWrapper = (
   errHandler: (error: Error) => Error,
 ) => {
   return async (options?: PopupLoginOptions, config?: PopupConfigOptions): Promise<void> => {
+    storeSetter('state', 'isLoading', true);
     try {
       await client.loginWithPopup(options, config);
     } catch (error) {
@@ -73,6 +75,7 @@ export const loginWithPopupWrapper = (
     storeSetter('state', {
       isAuthenticated: await client.isAuthenticated(),
       user: setUser(await client.getUser()),
+      isLoading: false,
       error: undefined,
     });
   };
@@ -97,7 +100,7 @@ export const loginWithPopupWrapper = (
 export const getAccessTokenSilentlyWrapper = (
   client: Auth0Client,
   storeSetter: SetStoreFunction<AuthStoreProps>,
-  currentUser: User,
+  currentUser: () => User,
 ) => {
   return async (options?: GetTokenSilentlyOptions): Promise<string> => {
     let token;
@@ -107,7 +110,7 @@ export const getAccessTokenSilentlyWrapper = (
       throw tokenError(error);
     } finally {
       const user = setUser(await client.getUser());
-      if (currentUser !== user) {
+      if (currentUser() !== user) {
         storeSetter('state', {
           isAuthenticated: await client.isAuthenticated(),
           user,
@@ -137,7 +140,7 @@ export const getAccessTokenSilentlyWrapper = (
 export const getAccessTokenWithPopupWrapper = (
   client: Auth0Client,
   storeSetter: SetStoreFunction<AuthStoreProps>,
-  currentUser: User,
+  currentUser: () => User,
 ) => {
   return async (
     options?: GetTokenWithPopupOptions,
@@ -150,7 +153,7 @@ export const getAccessTokenWithPopupWrapper = (
       throw tokenError(error);
     } finally {
       const user = setUser(await client.getUser());
-      if (currentUser !== user) {
+      if (currentUser() !== user) {
         storeSetter('state', {
           isAuthenticated: await client.isAuthenticated(),
           user,
@@ -182,7 +185,7 @@ export const getAccessTokenWithPopupWrapper = (
 export const handleRedirectCallbackWrapper = (
   client: Auth0Client,
   storeSetter: SetStoreFunction<AuthStoreProps>,
-  currentUser: User,
+  currentUser: () => User,
 ) => {
   return async (url?: string): Promise<RedirectLoginResult<AppState>> => {
     try {
@@ -191,7 +194,7 @@ export const handleRedirectCallbackWrapper = (
       throw tokenError(error);
     } finally {
       const user = setUser(await client.getUser());
-      if (currentUser !== user) {
+      if (currentUser() !== user) {
         storeSetter('state', {
           isAuthenticated: await client.isAuthenticated(),
           user,

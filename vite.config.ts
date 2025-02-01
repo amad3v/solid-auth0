@@ -5,7 +5,7 @@ import solidPlugin from 'vite-plugin-solid';
 export default defineConfig({
   build: {
     lib: {
-      entry: './src/main.ts',
+      entry: './src/index.ts',
       name: 'solid-auth0',
       formats: ['es', 'umd'],
       fileName: 'main',
