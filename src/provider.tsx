@@ -70,19 +70,26 @@ export const useAuthContext = () => useContext(AuthContext);
  */
 export const AuthProvider: Component<AuthProviderProps> = (_props) => {
   const props: Required<AuthProviderProps> = mergeProps(
-    { onRedirectCallback: defaultOnRedirectCallback, skipRedirectCallback: false },
+    {
+      onRedirectCallback: defaultOnRedirectCallback,
+      skipRedirectCallback: false,
+    },
     _props,
   );
+
   const [store, setStore] = createStore<AuthStoreProps>(initialStore);
 
-  const currentUser = (): User => store.state.user;
+  // const currentUser = (): User => store.state.user;
+  const currentUser = createMemo<User>(() => {
+    return store.state.user;
+  });
 
-  const handleError = (error: Error) => {
+  const handleError = (error: Error): never => {
     setStore('state', { error: error, isLoading: false });
-    return error;
+    throw error;
   };
 
-  const handleAuth = async (): Promise<Error | Auth0Client> => {
+  const handleAuth = async (): Promise<Auth0Client | undefined> => {
     const client = await createAuth0Client(toAuthClientOptions(props.clientOptions));
 
     try {
@@ -92,13 +99,17 @@ export const AuthProvider: Component<AuthProviderProps> = (_props) => {
       } else {
         await client.checkSession();
       }
-    } catch (err) {
-      return handleError(loginError(err));
+    } catch (error) {
+      handleError(loginError(error));
+      return undefined;
     }
 
+    const isAuthenticated = await client.isAuthenticated();
+    const user = setUser(await client.getUser());
+
     setStore('state', {
-      isAuthenticated: await client.isAuthenticated(),
-      user: setUser(await client.getUser()),
+      isAuthenticated,
+      user,
       isLoading: false,
       error: undefined,
     });
@@ -117,13 +128,19 @@ export const AuthProvider: Component<AuthProviderProps> = (_props) => {
   };
 
   // eslint-disable-next-line solid/reactivity
-  const [authClient] = createResource(() => props.clientOptions, handleAuth);
+  const [authClient, { refetch }] = createResource(() => props.clientOptions, handleAuth);
 
-  const value = createMemo<AuthContextProps>(() => ({
-    authManager: store,
-    authClient: () => authClient,
-  }));
+  const value = createMemo<AuthContextProps>(() => {
+    if (authClient.state === 'errored') {
+      refetch();
+    }
+
+    return {
+      authManager: store,
+      authClient: () => authClient,
+    };
+  });
 
   // eslint-disable-next-line solid/reactivity
-  return <AuthContext.Provider value={value()} children={props.children} />;
+  return <AuthContext.Provider value={value()}>{props.children}</AuthContext.Provider>;
 };

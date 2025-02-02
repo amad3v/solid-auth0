@@ -174,7 +174,7 @@ export interface AuthContextProps {
    * The instance of `Auth0Client` as a SolidJS resource
    * Use `authClient()` to access the data.
    */
-  authClient: () => Resource<Auth0Client | Error> | undefined;
+  authClient: () => Resource<Auth0Client | undefined>;
 }
 
 /**
