@@ -29,7 +29,7 @@ This library does **not** port the following features from `auth0-react`:
 
 ## Installation
 
-To install `solid-auth0` in your SolidJS project, you can use pnpm:
+To install [`solid-auth0`](https://www.npmjs.com/package/solid-auth0) in your SolidJS project, you can use `pnpm`:
 
 ```bash
 pnpm add solid-auth0
